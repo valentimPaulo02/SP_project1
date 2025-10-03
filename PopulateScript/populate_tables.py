@@ -17,14 +17,21 @@ def main():
     META_DATA.reflect(bind=engine)
     MED_TABLE = META_DATA.tables["med_data"]
     WORK_TABLE = META_DATA.tables["work_data"]
+    MED_TABLE_DEID = META_DATA.tables["med_data_deid"]
 
     with open("./Data/med.csv", 'r') as med_file:
-        med_csv = csv.reader(med_file)
+        med_csv = list(csv.reader(med_file))
 
         for line in med_csv:
             row = MED_TABLE.insert().values(id=line[0], name=line[1], age=line[2],
                 address=line[3], email=line[4], gender=line[5], postal_code=line[6],
                 diagnosis=line[7])
+            CONN.execute(row)
+        CONN.commit()
+
+        for line in med_csv:
+            row = MED_TABLE_DEID.insert().values(id=line[0], age=line[2], gender=line[5], 
+                postal_code=line[6], diagnosis=line[7])
             CONN.execute(row)
         CONN.commit()
 
