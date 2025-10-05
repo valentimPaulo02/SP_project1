@@ -1,0 +1,3 @@
+### DONT INCLUDE LOCAL FILES ###
+/linkage_attack/out_files/*
+/linkage_attack/scripts/__pycache__
