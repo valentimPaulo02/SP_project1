@@ -6,16 +6,19 @@ engine = create_engine("postgresql://postgres:password@localhost:5432/pds_proj_1
 
 def analysis():
 
-    med_orig = pd.read_sql("SELECT id, name FROM med_data", engine)
+    med_orig = pd.read_sql("SELECT id, name, age, gender, postal_code FROM med_data", engine)
     linked = pd.read_csv("./out_files/linked_candidates.csv")
 
-    med_orig["id"] = med_orig["id"].astype(int)
-    linked["id"] = linked["id"].astype(int)
+    med_orig["age"] = med_orig["age"].astype(int)
+    linked["age"] = linked["age"].astype(int)
+
+    med_orig["postal_code"] = med_orig["postal_code"].astype(str)
+    linked["postal_code"] = linked["postal_code"].astype(str)
 
     eval_df = linked.merge(
         med_orig,
-        on="id",
-        how="left"
+        on=["age", "gender", "postal_code"],
+        how="left",
     )
 
     eval_df["match"] = eval_df["name_x"].astype(str) == eval_df["name_y"].astype(str)

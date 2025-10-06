@@ -10,7 +10,7 @@ def link_candidates():
 
     med["postal_code"] = med["postal_code"].astype(str)
     work["postal_code"] = work["postal_code"].astype(str)
-
+    
     linked = med.merge(
         work[["postal_code", "gender", "name"]],
         on=["postal_code", "gender"],
