@@ -10,7 +10,7 @@ import pt.unl.fct.pds.proj1server.repository.MedDataKAnonRepository;
 import java.util.List;
 
 @Service
-public class KAnonymizationService {
+public class KAnonService {
 
     private final MedDataDeidRepository deidRepository;
     private final MedDataKAnonRepository kanonRepository;
@@ -18,7 +18,7 @@ public class KAnonymizationService {
     @Value("${privacy.k}")
     private int k;
 
-    public KAnonymizationService(MedDataDeidRepository deidRepository,
+    public KAnonService(MedDataDeidRepository deidRepository,
                                 MedDataKAnonRepository kanonRepository) {
         this.deidRepository = deidRepository;
         this.kanonRepository = kanonRepository;
@@ -32,7 +32,7 @@ public class KAnonymizationService {
         System.out.println("Running k-anonymity with k = " + k);
         System.out.println("Loaded " + allDeid.size() + " de-identified records.");
 
-        // Step 4: (Later) Save generalized records into kanonRepository
+        // (Later) Save generalized records into kanonRepository
         // kanonRepository.saveAll(anonymizedList);
     }
 }

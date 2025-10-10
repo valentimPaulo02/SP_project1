@@ -1,18 +1,18 @@
 package pt.unl.fct.pds.proj1server.controller;
 
-import pt.unl.fct.pds.proj1server.service.KAnonymizationService;
+import pt.unl.fct.pds.proj1server.service.KAnonService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/kanonymization")
-public class KAnonymizationController {
+@RequestMapping("/api/kanon")
+public class KAnonController {
 
-    private final KAnonymizationService kAnonymizationService;
+    private final KAnonService kAnonymizationService;
 
-    public KAnonymizationController(KAnonymizationService kAnonymizationService) {
+    public KAnonController(KAnonService kAnonymizationService) {
         this.kAnonymizationService = kAnonymizationService;
     }
 
