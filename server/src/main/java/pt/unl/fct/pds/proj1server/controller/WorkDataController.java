@@ -20,7 +20,7 @@ public class WorkDataController {
     private WorkDataRepository workDataRepository;
 
     @GetMapping
-    public List<WorkData> getAllWorkDatas() {
+    public List<WorkData> getAllWorkData() {
         return workDataRepository.findAll();
     }
 

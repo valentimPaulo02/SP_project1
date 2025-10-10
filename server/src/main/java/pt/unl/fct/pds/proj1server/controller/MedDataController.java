@@ -20,7 +20,7 @@ public class MedDataController {
     private MedDataRepository medDataRepository;
 
     @GetMapping
-    public List<MedData> getAllMedDatas() {
+    public List<MedData> getAllMedData() {
         return medDataRepository.findAll();
     }
 
