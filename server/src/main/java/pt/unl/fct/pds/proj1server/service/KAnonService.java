@@ -46,32 +46,24 @@ public class KAnonService {
         }
         List<List<Row>> partitions = splitPartition(data, k);
 
-        
-        // FOR CHECKING STAGES ------------------------
-        printPartitions(partitions);
-
-
-        // Generalize each final partition and persist into MedDataKAnon
-        /*
         List<MedDataKAnon> out = new ArrayList<>();
         for (List<Row> part : partitions) {
             Generalization g = buildGeneralization(part);
             for (Row r : part) {
                 MedDataKAnon x = new MedDataKAnon();
-                x.setId(r.id);                   // keep link to source if you have a field
-                x.setAge(g.age);                 // e.g. "28-35"
-                x.setGender(g.gender);           // e.g. "M/F"
-                x.setPostalCode(g.postalCode);       // e.g. "120**"
-                x.setDiagnosis(r.diagnosis);        // sensitive stays as-is
+                x.setAge(g.age);                 
+                x.setGender(g.gender);         
+                x.setPostalCode(g.postalCode);       
+                x.setDiagnosis(r.diagnosis);
                 out.add(x);
             }
         }
         kanonRepository.saveAll(out);
-        */
     }
 
-    // Algorithm functions ---------------------------------------------------
 
+    
+    // Algorithm functions ---------------------------------------------------
     private List<List<Row>> splitPartition(List<Row> rows, int k) {
         if (rows.size() <= 2*k - 1) {
             return List.of(rows);
@@ -92,7 +84,6 @@ public class KAnonService {
         result.addAll(splitPartition(sr.right, k));
         return result;
     }
-
 
     private Dimension chooseBestSplitDimension(List<Row> rows) {
         int minAge = rows.stream().mapToInt(r -> r.age).min().orElse(0);
@@ -147,13 +138,27 @@ public class KAnonService {
     }
 
     private Generalization buildGeneralization(List<Row> part) {
+
+        // generalize age - ( min - max )
         int minAge = part.stream().mapToInt(r -> r.age).min().orElse(0);
         int maxAge = part.stream().mapToInt(r -> r.age).max().orElse(0);
         String ageGen = (minAge == maxAge) ? String.valueOf(minAge) : minAge + "-" + maxAge;
 
-        Set<String> genders = part.stream().map(r -> r.gender).collect(Collectors.toCollection(LinkedHashSet::new));
-        String genderGen = (genders.size() == 1) ? genders.iterator().next() : String.join("/", genders);
+        // generalize gender - ( male/female/other )
+        boolean hasMale = false, hasFemale = false, hasOther = false;
+        for (Row r : part) {
+            String g = collapseGender(r.gender);
+            if ("Male".equals(g)) hasMale = true;
+            else if ("Female".equals(g)) hasFemale = true;
+            else hasOther = true;
+        }
+        StringBuilder gsb = new StringBuilder();
+        if (hasMale)   gsb.append("Male");
+        if (hasFemale) { if (gsb.length() > 0) gsb.append('/'); gsb.append("Female"); }
+        if (hasOther)  { if (gsb.length() > 0) gsb.append('/'); gsb.append("Other"); }
+        String genderGen = gsb.length() == 0 ? "Other" : gsb.toString();
 
+        // generalize postal code - ( *********, always 9 digits even when only has 5 )
         List<String> postals = part.stream().map(r -> r.postal).toList();
         String prefix = commonPrefix(postals);
         int maxLen = postals.stream().mapToInt(String::length).max().orElse(prefix.length());
@@ -177,22 +182,15 @@ public class KAnonService {
         return p;
     }
 
-    private static void printPartitions(List<List<Row>> partitions) {
-        System.out.println("=========== PARTITIONS ==========");
-        for (int i = 0; i < partitions.size(); i++) {
-            List<Row> block = partitions.get(i);
-            System.out.printf("Block %02d  (size=%d)%n", i + 1, block.size());
-            for (Row r : block) {
-                System.out.println("  " + r);
-            }
-            System.out.println("---------------------------------");
-        }
-        System.out.println("=================================");
-    }
-
-
 
     // DTOs and helpers ---------------------------------
+    private static String collapseGender(String gender) {
+        return switch (gender.trim().toLowerCase()) {
+            case "male", "m" -> "Male";
+            case "female", "f" -> "Female";
+            default -> "Other";
+        };
+    }
 
     static class Row {
         long id; int age; String gender; String postal; String diagnosis;
@@ -207,10 +205,6 @@ public class KAnonService {
                     id, age, gender, postal, diagnosis);
         }
     }
-
-
-
-
 
     enum Dimension { AGE, GENDER, POSTAL, NONE }
     record SplitResult(List<Row> left, List<Row> right) {}

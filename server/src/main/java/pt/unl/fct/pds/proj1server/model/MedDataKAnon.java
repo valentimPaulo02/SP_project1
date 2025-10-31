@@ -42,5 +42,5 @@ public class MedDataKAnon {
     public void setAge(String age) {this.age = age;}
     public void setGender(String gender) {this.gender = gender;}
     public void setPostalCode(String postalCode) {this.postalCode = postalCode;}
-    public void setDiagnosis(String Diagnosis) {this.diagnosis = diagnosis;}
+    public void setDiagnosis(String diagnosis) {this.diagnosis = diagnosis;}
 }
