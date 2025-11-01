@@ -2,6 +2,8 @@ package pt.unl.fct.pds.proj1server.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import pt.unl.fct.pds.proj1server.DTO.Row;
 import pt.unl.fct.pds.proj1server.model.MedDataDeid;
 import pt.unl.fct.pds.proj1server.model.MedDataKAnon;
 import pt.unl.fct.pds.proj1server.repository.MedDataDeidRepository;
@@ -9,10 +11,8 @@ import pt.unl.fct.pds.proj1server.repository.MedDataKAnonRepository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +54,7 @@ public class KAnonService {
                 x.setAge(g.age);                 
                 x.setGender(g.gender);         
                 x.setPostalCode(g.postalCode);       
-                x.setDiagnosis(r.diagnosis);
+                x.setDiagnosis(r.getDiagnosis());
                 out.add(x);
             }
         }
@@ -86,14 +86,14 @@ public class KAnonService {
     }
 
     private Dimension chooseBestSplitDimension(List<Row> rows) {
-        int minAge = rows.stream().mapToInt(r -> r.age).min().orElse(0);
-        int maxAge = rows.stream().mapToInt(r -> r.age).max().orElse(0);
+        int minAge = rows.stream().mapToInt(r -> r.getAge()).min().orElse(0);
+        int maxAge = rows.stream().mapToInt(r -> r.getAge()).max().orElse(0);
         double ageSpan = maxAge - minAge;
 
-        long genderDistinct = rows.stream().map(r -> r.gender).distinct().count();
+        long genderDistinct = rows.stream().map(r -> r.getGender()).distinct().count();
 
-        String prefix = commonPrefix(rows.stream().map(r -> r.postal).toList());
-        int maxPlen = rows.stream().mapToInt(r -> r.postal.length()).max().orElse(prefix.length());
+        String prefix = commonPrefix(rows.stream().map(r -> r.getPostal()).toList());
+        int maxPlen = rows.stream().mapToInt(r -> r.getPostal().length()).max().orElse(prefix.length());
         double postalSpan = Math.max(0, maxPlen - prefix.length());
 
         Dimension best = Dimension.NONE;
@@ -110,19 +110,19 @@ public class KAnonService {
         List<Row> left = new ArrayList<>(), right = new ArrayList<>();
         switch (d) {
             case AGE -> {
-                List<Row> sorted = rows.stream().sorted(Comparator.comparingInt(r -> r.age)).toList();
+                List<Row> sorted = rows.stream().sorted(Comparator.comparingInt(r -> r.getAge())).toList();
                 int mid = sorted.size() / 2;
                 left.addAll(sorted.subList(0, mid));
                 right.addAll(sorted.subList(mid, sorted.size()));
             }
             case POSTAL -> {
-                List<Row> sorted = rows.stream().sorted(Comparator.comparing(r -> r.postal)).toList();
+                List<Row> sorted = rows.stream().sorted(Comparator.comparing(r -> r.getPostal())).toList();
                 int mid = sorted.size() / 2;
                 left.addAll(sorted.subList(0, mid));
                 right.addAll(sorted.subList(mid, sorted.size()));
             }
             case GENDER -> {
-                Map<String, List<Row>> by = rows.stream().collect(Collectors.groupingBy(r -> r.gender));
+                Map<String, List<Row>> by = rows.stream().collect(Collectors.groupingBy(r -> r.getGender()));
                 List<Map.Entry<String, List<Row>>> groups = new ArrayList<>(by.entrySet());
                 groups.sort((a, b) -> Integer.compare(b.getValue().size(), a.getValue().size()));
                 if (groups.size() == 1) {
@@ -140,14 +140,14 @@ public class KAnonService {
     private Generalization buildGeneralization(List<Row> part) {
 
         // generalize age - ( min - max )
-        int minAge = part.stream().mapToInt(r -> r.age).min().orElse(0);
-        int maxAge = part.stream().mapToInt(r -> r.age).max().orElse(0);
+        int minAge = part.stream().mapToInt(r -> r.getAge()).min().orElse(0);
+        int maxAge = part.stream().mapToInt(r -> r.getAge()).max().orElse(0);
         String ageGen = (minAge == maxAge) ? String.valueOf(minAge) : minAge + "-" + maxAge;
 
         // generalize gender - ( male/female/other )
         boolean hasMale = false, hasFemale = false, hasOther = false;
         for (Row r : part) {
-            String g = collapseGender(r.gender);
+            String g = collapseGender(r.getGender());
             if ("Male".equals(g)) hasMale = true;
             else if ("Female".equals(g)) hasFemale = true;
             else hasOther = true;
@@ -159,7 +159,7 @@ public class KAnonService {
         String genderGen = gsb.length() == 0 ? "Other" : gsb.toString();
 
         // generalize postal code - ( *********, always 9 digits even when only has 5 )
-        List<String> postals = part.stream().map(r -> r.postal).toList();
+        List<String> postals = part.stream().map(r -> r.getPostal()).toList();
         String prefix = commonPrefix(postals);
         int maxLen = postals.stream().mapToInt(String::length).max().orElse(prefix.length());
         StringBuilder sb = new StringBuilder(prefix);
@@ -183,27 +183,13 @@ public class KAnonService {
     }
 
 
-    // DTOs and helpers ---------------------------------
+    // helpers ---------------------------------
     private static String collapseGender(String gender) {
         return switch (gender.trim().toLowerCase()) {
             case "male", "m" -> "Male";
             case "female", "f" -> "Female";
             default -> "Other";
         };
-    }
-
-    static class Row {
-        long id; int age; String gender; String postal; String diagnosis;
-
-        Row(long id, int age, String gender, String postal, String diagnosis) {
-            this.id = id; this.age = age; this.gender = gender; this.postal = postal; this.diagnosis = diagnosis;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("{id=%d, age=%d, gender=%s, postal=%s, diagnosis=%s}",
-                    id, age, gender, postal, diagnosis);
-        }
     }
 
     enum Dimension { AGE, GENDER, POSTAL, NONE }
