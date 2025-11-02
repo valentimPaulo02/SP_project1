@@ -1,39 +1,43 @@
 package pt.unl.fct.pds.proj1server.model;
 
-public class CountResponse {
+public class AverageResponse {
     private String attribute;
-    private int value;
+    private double value;
     private double epsilonUsed;       
     private double remainingBudget;   
-    private double sensitivity; 
+    private double sumSensitivity; 
+    private double countSensitivity;
 
-    public CountResponse() {
+    public AverageResponse() {
     }
 
-    public CountResponse(
+    public AverageResponse(
             String attribute,
             int value) {
         this.attribute = attribute;
         this.value = value;
     }
 
-    public CountResponse(String attribute, int value, Double epsilonUsed, Double remainingBudget, Double sensitivity) {
+    public AverageResponse(String attribute, double value, Double epsilonUsed, Double remainingBudget, Double sumSensitivity, Double countSensitivity) {
         this.attribute = attribute;
         this.value = value;
         this.epsilonUsed = epsilonUsed;
         this.remainingBudget = remainingBudget;
-        this.sensitivity = sensitivity;
+        this.sumSensitivity = sumSensitivity;
+        this.countSensitivity = countSensitivity;
     }
 
     public String getAttribute() {return attribute;}
-    public int getValue() {return value;}
+    public Double getValue() {return value;}
     public Double getEpsilonUsed() {return epsilonUsed;} 
     public Double getRemainingBudget() {return remainingBudget;} 
-    public Double getSensitivity() {return sensitivity;}
+    public Double getSumSensitivity() {return sumSensitivity;}
+    public Double getCountSensitivity() {return countSensitivity;}
     
     public void setAttribute(String attribute) {this.attribute = attribute;}
     public void setValue(int value) {this.value = value;}
     public void setEpsilonUsed(Double epsilonUsed) {this.epsilonUsed = epsilonUsed;}
     public void setRemainingBudget(Double remainingBudget) {this.remainingBudget = remainingBudget;}
-    public void setSensitivity(Double sensitivity) {this.sensitivity = sensitivity;}
+    public void setSumSensitivity(Double sumSensitivity) {this.sumSensitivity = sumSensitivity;}
+    public void setCountSensitivity(Double countSensitivity) {this.countSensitivity = countSensitivity;}
 }

@@ -20,8 +20,8 @@ public class KAnonController {
     @PostMapping("/run")
     public Map<String, Integer> runKAnonymity() {
         Map<String, Integer> res = new HashMap<>();
-        try { kAnonymizationService.runKAnonymization(); res.put("success", 1); }
-        catch (Exception e) { e.printStackTrace(); res.put("success", 0); }
+        try { kAnonymizationService.runKAnonymization(); res.put("success running (1 - true, 0 - false)", 1); }
+        catch (Exception e) { e.printStackTrace(); res.put("success running (1 - true, 0 - false)", 0); }
         return res;
     }
 }
