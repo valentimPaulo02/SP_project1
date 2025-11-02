@@ -15,9 +15,13 @@ public class LinkageAttackController {
         this.service = service;
     }
 
-    @PostMapping("/run")
-    public LinkageSummary runLinkage() {
-        return service.runLinkageAttack();
+    @PostMapping("/run/deid")
+    public LinkageSummary runDeid() {
+        return service.runLinkageAttack("deid");
     }
-  
+
+    @PostMapping("/run/kanon")
+    public LinkageSummary runKanon() {
+        return service.runLinkageAttack("kanon");
+    }
 }
