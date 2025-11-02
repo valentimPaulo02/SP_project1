@@ -120,7 +120,7 @@ public class DpService {
       double noisyAvg = noisySum / noisyCount;
 
       return Optional.of(new AverageResponse(
-              "age",
+              req.getFilterValue(),
               noisyAvg,
               eps,
               budget.getRemaining(),

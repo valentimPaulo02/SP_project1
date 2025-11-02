@@ -2,7 +2,7 @@ package pt.unl.fct.pds.proj1server.model;
 
 public class AverageResponse {
     private String attribute;
-    private double value;
+    private double averageAge;
     private double epsilonUsed;       
     private double remainingBudget;   
     private double sumSensitivity; 
@@ -13,14 +13,14 @@ public class AverageResponse {
 
     public AverageResponse(
             String attribute,
-            int value) {
+            double averageAge) {
         this.attribute = attribute;
-        this.value = value;
+        this.averageAge = averageAge;
     }
 
-    public AverageResponse(String attribute, double value, Double epsilonUsed, Double remainingBudget, Double sumSensitivity, Double countSensitivity) {
+    public AverageResponse(String attribute, double averageAge, Double epsilonUsed, Double remainingBudget, Double sumSensitivity, Double countSensitivity) {
         this.attribute = attribute;
-        this.value = value;
+        this.averageAge = averageAge;
         this.epsilonUsed = epsilonUsed;
         this.remainingBudget = remainingBudget;
         this.sumSensitivity = sumSensitivity;
@@ -28,14 +28,14 @@ public class AverageResponse {
     }
 
     public String getAttribute() {return attribute;}
-    public Double getValue() {return value;}
+    public Double getAverageAge() {return averageAge;}
     public Double getEpsilonUsed() {return epsilonUsed;} 
     public Double getRemainingBudget() {return remainingBudget;} 
     public Double getSumSensitivity() {return sumSensitivity;}
     public Double getCountSensitivity() {return countSensitivity;}
     
     public void setAttribute(String attribute) {this.attribute = attribute;}
-    public void setValue(int value) {this.value = value;}
+    public void setAverageAge(int averageAge) {this.averageAge = averageAge;}
     public void setEpsilonUsed(Double epsilonUsed) {this.epsilonUsed = epsilonUsed;}
     public void setRemainingBudget(Double remainingBudget) {this.remainingBudget = remainingBudget;}
     public void setSumSensitivity(Double sumSensitivity) {this.sumSensitivity = sumSensitivity;}
